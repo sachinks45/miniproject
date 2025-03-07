@@ -10,6 +10,7 @@ import deepchem as dc
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
+import pubchempy as pcp
 
 # Load environment variables and configure Gemini
 load_dotenv()
@@ -21,7 +22,7 @@ model = dc.models.GraphConvModel(n_tasks=12, mode='classification')
 print("Pretrained model loaded successfully.")
 
 app = Flask(__name__)
-CORS(app)  # Allow cross-origin requests from your React frontend
+CORS(app)  # Allow cross-origin requests from React frontend
 
 def convert_smiles_to_mol(smiles):
     try:
@@ -87,7 +88,16 @@ def get_molecule_properties(smiles):
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None, "Invalid SMILES string"
+        
+        # Fetch molecule name using PubChem
+        try:
+            compound = pcp.get_compounds(smiles, 'smiles')
+            molecule_name = compound[0].iupac_name if compound else "Unknown Molecule"
+        except Exception:
+            molecule_name = "Unknown Molecule"
+        
         properties = {
+            "Molecule Name": molecule_name,
             "Molecular Weight": f"{Descriptors.ExactMolWt(mol):.2f}",
             "LogP": f"{Descriptors.MolLogP(mol):.2f}",
             "H-Bond Donors": str(Descriptors.NumHDonors(mol)),
@@ -96,7 +106,9 @@ def get_molecule_properties(smiles):
             "TPSA": f"{Descriptors.TPSA(mol):.2f}",
             "Aromatic Rings": str(Descriptors.NumAromaticRings(mol))
         }
+        
         explanation = (
+            f"Molecule Name: {properties['Molecule Name']}\n"
             f"Molecular Weight: {properties['Molecular Weight']} g/mol\n"
             f"LogP: {properties['LogP']} (lipophilicity)\n"
             f"H-Bond Donors: {properties['H-Bond Donors']}\n"
@@ -105,6 +117,7 @@ def get_molecule_properties(smiles):
             f"TPSA: {properties['TPSA']} Å²\n"
             f"Aromatic Rings: {properties['Aromatic Rings']}"
         )
+        
         return properties, explanation
     except Exception as e:
         return None, str(e)

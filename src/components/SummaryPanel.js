@@ -3,14 +3,14 @@ import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import styled from 'styled-components';
 
-const SummaryPanel = () => {
+const SummaryPanel = ({smiles}) => {
   const [prompt, setPrompt] = useState('');
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Example SMILES string; you can modify this or pass it as a prop.
-  const smiles = "CC(=O)Oc1ccccc1C(=O)O";
+  //const smiles = "CC(=O)Oc1ccccc1C(=O)O";
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -38,9 +38,9 @@ const SummaryPanel = () => {
     <div className="right-container">
       <h3>AI Summary</h3>
       {/* Using PrimeReact InputTextarea with autoResize */}
-      <InputTextarea 
-        autoResize 
-        value={prompt} 
+      <InputTextarea
+        autoResize
+        value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         placeholder="Enter your question here..."
         rows={5}
@@ -49,11 +49,11 @@ const SummaryPanel = () => {
           width: "100%",
           marginBottom: "10px",
           backgroundColor: "black",
-          border:"black",
+          border: "black",
           color: "white"
         }}
       />
-      
+
       <StyledWrapper><Button
         label={loading ? "Loading..." : "Ask AI"}
         icon="pi pi-check"

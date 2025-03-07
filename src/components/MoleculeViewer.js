@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
-const MoleculeViewer = () => {
+const MoleculeViewer = ({smiles}) => {
   const mountRef = useRef(null);
   const isInitialized = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,18 +13,24 @@ const MoleculeViewer = () => {
   const controlsRef = useRef(null);
   const moleculeGroupRef = useRef(null);
   const animationIdRef = useRef(null);
-
+  console.log(smiles)
+  useEffect(() => {
+    if (isInitialized.current) {
+      loadMolecule();
+    }
+  }, [smiles]);
   useEffect(() => {
     // Initialize scene, camera, renderer
+    
     if (isInitialized.current) return;
     isInitialized.current = true;
     const scene = sceneRef.current;
     scene.background = new THREE.Color(0x000000);
 
-    const camera = new THREE.PerspectiveCamera(75, 
+    const camera = new THREE.PerspectiveCamera(25,
       window.innerWidth / window.innerHeight,
-      0.1,
-      1000);
+      4,
+      100);
     camera.position.z = 5;
     cameraRef.current = camera;
     window.addEventListener('resize', () => {
@@ -32,25 +38,6 @@ const MoleculeViewer = () => {
       camera.updateProjectionMatrix()
       renderer.setSize(window.innerWidth, window.innerHeight);
     })
-    const adjustCamera = (moleculeGroup) => {
-      const box = new THREE.Box3().setFromObject(moleculeGroup);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      
-      // Calculate appropriate camera distance
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const fov = camera.fov * (Math.PI / 180);
-      let cameraZ = Math.abs((maxDim / 2) / Math.tan(fov / 2));
-  
-      // Add some padding
-      cameraZ *= 1.5;
-      
-      camera.position.copy(center);
-      camera.position.z += cameraZ;
-      controls.target.copy(center);
-      controls.update();
-    };
-  
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     const rendererDom = renderer.domElement;
@@ -59,15 +46,50 @@ const MoleculeViewer = () => {
 
     // Setup controls
     const controls = new OrbitControls(camera, rendererDom);
+    controls.minZoom = 0.5;  // Minimum zoom level
+    controls.maxZoom = 0.5;    // Maximum zoom level
+
+    // Limit camera distance (alternate to zoom)
+    controls.minDistance = 20;  // Closest the camera can get
+    controls.maxDistance = 30; // Farthest the camera can go
+
+    document.addEventListener("wheel", (event) => {
+      const zoom = camera.position.distanceTo(controls.target);
+  
+      if (zoom <= controls.minDistance || zoom >= controls.maxDistance) {
+          // Allow normal scrolling when zoom limit is reached
+          controls.enableZoom = false; // Temporarily disable OrbitControls zoom
+          document.body.style.overflow = "auto";
+      } else {
+          // Prevent normal scrolling while within zoom range
+          event.preventDefault();
+          controls.enableZoom = true; // Re-enable OrbitControls zoom
+          document.body.style.overflow = "hidden";
+      }
+  });
+  
+  // Ensure zoom is always enabled when interacting
+  controls.addEventListener("start", () => {
+      controls.enableZoom = true;
+  });
+
+    // Limit vertical rotation (polar angle)
+    controls.minPolarAngle = 0;    // Radians (0 = top-down)
+    controls.maxPolarAngle = Math.PI / 2; // 90 degrees
+
+    // Limit horizontal rotation (azimuth angle)
+    // controls.minAzimuthAngle = -Math.PI / 4; // -45 degrees
+    // controls.maxAzimuthAngle = Math.PI / 4;  // +45 degrees
+
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controlsRef.current = controls;
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(10, 10, 10);
+    directionalLight.position.set(0, 0, 0);
     scene.add(directionalLight);
 
     loadMolecule();
@@ -85,8 +107,8 @@ const MoleculeViewer = () => {
       animationIdRef.current = requestAnimationFrame(animate);
 
       if (moleculeGroupRef.current) {
-        moleculeGroupRef.current.rotation.z += 0.005;
         moleculeGroupRef.current.rotation.y += 0.005;
+        moleculeGroupRef.current.rotation.z += 0.005;
       }
 
       controls.update();
@@ -122,8 +144,11 @@ const MoleculeViewer = () => {
         sceneRef.current.remove(moleculeGroupRef.current);
         moleculeGroupRef.current = null;
       }
-
-      const smiles = "CCO"; // Replace with your desired SMILES string or get it dynamically
+      if (!smiles || typeof smiles !== "string") {
+        console.error("Invalid SMILES input:", smiles);
+        return;
+    }
+      // const smiles = "CC(=O)Oc1ccccc1C(=O)O";      
       const response = await fetch('http://localhost:8000/convert', {
         method: 'POST',
         headers: {
@@ -133,13 +158,12 @@ const MoleculeViewer = () => {
       });
       const data = await response.json();
       const molData = data.mol_block;
-
       const moleculeGroup = parseMolFile(molData);
 
       sceneRef.current.add(moleculeGroup);
       moleculeGroupRef.current = moleculeGroup;
 
-      
+
       // Center camera
       const box = new THREE.Box3().setFromObject(moleculeGroup);
       const center = box.getCenter(new THREE.Vector3());
@@ -157,7 +181,7 @@ const MoleculeViewer = () => {
     }
   };
 
-  // ... keep the parseMolFile and createMoleculeGeometry functions unchanged ...
+  //Parsing of the molecule.mol file from backend
   const parseMolFile = (molData) => {
     const lines = molData.split('\n').map(line => line.replace(/\r/g, ''));
     const atoms = [];
@@ -191,10 +215,14 @@ const MoleculeViewer = () => {
     const group = new THREE.Group();
 
     atoms.forEach((atom) => {
-      const radius = atom.element === 'H' ? 0.1 : 0.2;
+      const radius = atom.element === 'H' ? 0.1 : 0.3;
       const geometry = new THREE.SphereGeometry(radius, 16, 16);
       const material = new THREE.MeshPhongMaterial({
-        color: atom.element === 'H' ? 0xffffff : 0x808080,
+        color: atom.element === 'H' ? 0xffffff :
+         atom.element === 'C' ? 0x808080 :
+          atom.element === 'N' ? 0x0000ff :
+           atom.element === 'O' ? 0xff0000 
+           : 0xff00ff,
         shininess: 100
       });
       const sphere = new THREE.Mesh(geometry, material);
@@ -211,7 +239,7 @@ const MoleculeViewer = () => {
       const createBond = (offset) => {
         const direction = new THREE.Vector3().subVectors(end, start);
         const length = direction.length();
-        const geometry = new THREE.CylinderGeometry(0.03, 0.03, length, 8);
+        const geometry = new THREE.CylinderGeometry(0.04, 0.04, length, 8);
         const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
         const cylinder = new THREE.Mesh(geometry, material);
         const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
@@ -231,8 +259,8 @@ const MoleculeViewer = () => {
 
       switch (bond.order) {
         case 2:
-          group.add(createBond(0.05));
-          group.add(createBond(-0.05));
+          group.add(createBond(0.06));
+          group.add(createBond(-0.06));
           break;
         case 3:
           group.add(createBond(0.1));
@@ -244,7 +272,8 @@ const MoleculeViewer = () => {
           break;
       }
     });
-
+    // console.log(atoms)
+    // console.log(bonds)
     return group;
   };
 
@@ -252,17 +281,6 @@ const MoleculeViewer = () => {
     <div className="molecule-viewer-container">
       {/* Canvas container */}
       <div ref={mountRef} className="canvas-container" />
-      
-      {/* Left sidebar */}
-      <div className="sidebar left-sidebar">
-        {/* Your left sidebar content */}
-      </div>
-      
-      {/* Right sidebar */}
-      <div className="sidebar right-sidebar">
-        {/* Your right sidebar content */}
-      </div>
-      
       {/* Loading overlay */}
       {isLoading && (
         <div className="loading-overlay">
