@@ -201,8 +201,8 @@ th {
 
  .main {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   overflow-y: auto; /* Enable scrolling */
   overflow-x: hidden; /* Prevent horizontal scroll */
 }
@@ -259,22 +259,527 @@ th {
   z-index: 1000;    /* Ensures it's always on top */
 }
 
+.input-parent{
+  display: flex;
+    justify-content: center;  /* Centers horizontally */
+    align-items: center;      
+}
+
 .input-container{
+  display: flex;
+  justify-content:space-evenly;
+  align-items: center;
+  /* max-width: 50vw; */
   color: white;
   text-align: center;
   margin-bottom: 0px;
-  
+  border-radius: 3px;
+  /* background-color: #007bff; */
 }
 
 .input-container input{
   border-radius: 7px;
   width: 250px;
   height: auto;
+  margin-left: 5px;
   padding: 5px;
 }
 .space{
   margin: 20px 20px 0px 20px;
 }
-.label{
 
+.molecule {
+  display: flex;
+  justify-content: center;  /* Centers horizontally */
+  align-items: center;      /* Centers vertically */
+  height: 100vh;            /* Full height of the viewport */
+}
+
+.properties-box {
+  background: #f8f9fa; /* Light grey background */
+  border-radius: 10px;
+  padding: 15px;
+  max-width: 400px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+
+.properties-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.property-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.property-name {
+  font-weight: bold;
+  color: #333;
+}
+
+.property-value {
+  color: #007bff;
+}
+
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* height: 100vh; */
+  background-color: #f4f4f4;
+  text-align: center;
+}
+
+.landing-container input {
+  padding: 10px;
+  margin: 10px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.landing-container button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.landing-container button:hover {
+  background-color: #0056b3;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  transition: all 0.8s ease-in-out;
+}
+html {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+.prediction-chart{
+  display: flex;
+  flex-direction:row;
+}
+.unique-canvas{
+  display: flex;
+  flex-direction: column;
+  max-width:fit-content;
+  max-height: 500px;
+  margin-top: 1400px;
+}
+
+/* src/components/EntryPage.css */
+.entry-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.project-name {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 3em;
+  text-align: center;
+  z-index: 1;
+  pointer-events: none;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px #000;
+}
+
+.enter-button {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 20px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 2px solid white;
+  cursor: pointer;
+  z-index: 1;
+  transition: background 0.3s, color 0.3s;
+  font-size: 1.2em;
+}
+
+.enter-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: black;
+}
+
+.canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.toxicity-input {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  border-radius: 8px;
+  color: white;
+}
+
+.toxicity-input input {
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  background: #333;
+  border: none;
+  color: white;
+}
+
+.toxicity-input button {
+  padding: 0.5rem 1rem;
+  background: #ff4444;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.5rem;
+}
+
+:root {
+  --primary-color: #2a9d8f;
+  --primary-hover: #21867a;
+  --text-color: #2b2d42;
+  --background-color: #f8f9fa;
+  --border-color: #ced4da;
+  --error-color: #e76f51;
+}
+
+.smiles-input-container {
+  max-width: 800px;
+  margin: -9rem auto;
+  padding: 0 1rem;
+}
+
+.input-group {
+  position: relative;
+  margin-top: 210px;
+}
+
+.input-wrapper {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.modern-input {
+  width: 100%;
+  padding: 1.25rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: white;
+  color: var(--text-color);
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+}
+
+.floating-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, .9);
+  padding: 0 0.3rem;
+}
+
+.modern-input:focus ~ .floating-label,
+.modern-input:not(:placeholder-shown) ~ .floating-label {
+  top: 0;
+  font-size: 0.8rem;
+  color: var(--primary-color);
+}
+
+.clear-button {
+  position: absolute;
+  right: -2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--border-color);
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.clear-button:hover {
+  color: var(--text-color);
+}
+
+.analyze-button {
+  width: 112%;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.analyze-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.analyze-button:active {
+  transform: translateY(0);
+}
+
+.input-hint {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.icon {
+  font-size: 1.2rem;
+}
+
+/* Add some animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.smiles-input-container {
+  margin-top: -250px;
+  animation: slideIn 0.5s ease-out;
+  margin-bottom: 10px;
+}
+.viewer-container {
+  position: relative;
+  width: 100%;
+  min-height: 400px; /* Adjust based on your needs */
+  margin-bottom: 2rem;
+}
+/* Dark theme with opaque background */
+.molecule {
+  margin-bottom: 20px;
+  color: #ffffff; /* White text for dark background */
+}
+
+.properties-box {
+  background-color: rgba(255, 255, 255, 0.40); /* Dark gray with 85% opacity */
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.properties-table {
+  margin-top: 15px;
+}
+
+.property-row {
+  display: flex;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.property-row:last-child {
+  border-bottom: none;
+}
+
+.property-name {
+  font-weight: 600;
+  width: 40%;
+  color: #000000; /* Light gray for property names */
+}
+
+.property-value {
+  width: 60%;
+  color: #000000; /* White for values */
+}
+
+/* Optional hover effect */
+.property-row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+/* Glass Morphism Effect */
+.glass-box {
+  background: rgba(20, 20, 20, 0.9); /* Semi-transparent dark */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle glass border */
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    inset 0 0 10px rgba(255, 255, 255, 0.05); /* Inner glow */
+}
+
+.glass-table {
+  margin-top: 15px;
+}
+
+.glass-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.glass-row:last-child {
+  border-bottom: none;
+}
+
+.glass-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.glass-property-name {
+  font-weight: 500;
+  width: 40%;
+  color: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
+  letter-spacing: 0.5px;
+}
+
+.glass-property-value {
+  width: 60%;
+  color: white;
+  font-weight: 300;
+}
+
+/* Optional: Add a light gradient overlay */
+.glass-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: -1;
+}
+/* App Header Styles */
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: .5rem;
+}
+
+.app-title {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 194, 242, 0.7);
+  letter-spacing: 1px;
+  margin: 0;
+  background: linear-gradient(90deg, #00c2f2, #0077ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: 0 1rem;
+}
+
+/* Optional animation for the title */
+@keyframes glow {
+  0% { text-shadow: 0 0 10px rgba(0, 194, 242, 0.7); }
+  50% { text-shadow: 0 0 20px rgba(0, 194, 242, 0.9); }
+  100% { text-shadow: 0 0 10px rgba(0, 194, 242, 0.7); }
+}
+
+.app-title {
+  animation: glow 3s ease-in-out infinite;
+}
+.app-title1 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 194, 242, 0.7);
+  letter-spacing: 1px;
+  margin: 0;
+  background: linear-gradient(90deg, #00c2f2, #0077ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: 0 1rem;
+}
+.app-title2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 194, 242, 0.7);
+  letter-spacing: 1px;
+  margin: 0;
+  background: linear-gradient(90deg, #00c2f2, #0077ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: 0 1rem;
+}
+.modern-input {
+  color: white;
+  background-color: rgba(255, 255, 255, .25); /* last value 1 = fully opaque */
+}
+
+.analyze-button {
+  background-color: rgba(yourR, yourG, yourB, .25); /* last value 1 = fully opaque */
 }

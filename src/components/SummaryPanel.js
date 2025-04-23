@@ -9,9 +9,6 @@ const SummaryPanel = ({smiles}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Example SMILES string; you can modify this or pass it as a prop.
-  //const smiles = "CC(=O)Oc1ccccc1C(=O)O";
-
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
@@ -25,7 +22,6 @@ const SummaryPanel = ({smiles}) => {
         throw new Error("Error fetching AI summary");
       }
       const data = await response.json();
-      // data.gemini_response contains the AI response from your Flask backend.
       setSummary(data.gemini_response);
     } catch (err) {
       console.error("Error fetching AI summary:", err);
@@ -35,9 +31,8 @@ const SummaryPanel = ({smiles}) => {
   };
 
   return (
-    <div className="right-container">
-      <h3>AI Summary</h3>
-      {/* Using PrimeReact InputTextarea with autoResize */}
+    <GlassPanel>
+      <h3 className="app-title1">ToxiDesk</h3>
       <InputTextarea
         autoResize
         value={prompt}
@@ -48,28 +43,53 @@ const SummaryPanel = ({smiles}) => {
         style={{
           width: "100%",
           marginBottom: "10px",
-          backgroundColor: "black",
-          border: "black",
-          color: "white"
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          color: "white",
+          borderRadius: "6px",
+          padding: "12px"
         }}
       />
 
-      <StyledWrapper><Button
-        label={loading ? "Loading..." : "Ask AI"}
-        icon="pi pi-check"
-        loading={loading}
-        disabled={loading || !prompt}
-        onClick={handleSubmit}
-      /></StyledWrapper>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <StyledWrapper>
+        <Button
+          label={loading ? "Loading..." : "Ask AI"}
+          icon="pi pi-check"
+          loading={loading}
+          disabled={loading || !prompt}
+          onClick={handleSubmit}
+        />
+      </StyledWrapper>
+      
+      {error && <p style={{ color: "#ff4444" }}>{error}</p>}
+      
       {summary && (
-        <div style={{ marginTop: "15px" }}>
+        <SummaryContent>
           <p>{summary}</p>
-        </div>
+        </SummaryContent>
       )}
-    </div>
+    </GlassPanel>
   );
 };
+
+// Styled components
+const GlassPanel = styled.div`
+  background: rgba(30, 30, 30, 0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 80%;
+`;
+
+const SummaryContent = styled.div`
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border-left: 3px solid #0077ff;
+`;
 
 const StyledWrapper = styled.div`
   button {
@@ -81,38 +101,26 @@ const StyledWrapper = styled.div`
     line-height: 2.5em;
     overflow: hidden;
     cursor: pointer;
-    margin: 20px;
+    margin: 20px 0;
     font-size: 17px;
     z-index: 1;
     color: var(--color);
     border: 2px solid var(--color);
     border-radius: 6px;
     position: relative;
-  }
-
-  button::before {
-    position: absolute;
-    content: "";
-    background: var(--color);
-    width: 150px;
-    height: 200px;
-    z-index: -1;
-    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
   }
 
   button:hover {
     color: white;
+    background: rgba(0, 119, 255, 0.2);
   }
 
-  button:before {
-    top: 100%;
-    left: 100%;
-    transition: 0.3s all;
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
-
-  button:hover::before {
-    top: -30px;
-    left: -30px;
-  }`;
+`;
 
 export default SummaryPanel;

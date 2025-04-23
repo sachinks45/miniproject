@@ -219,11 +219,14 @@ const MoleculeViewer = ({smiles}) => {
       const geometry = new THREE.SphereGeometry(radius, 16, 16);
       const material = new THREE.MeshPhongMaterial({
         color: atom.element === 'H' ? 0xffffff :
-         atom.element === 'C' ? 0x808080 :
-          atom.element === 'N' ? 0x0000ff :
-           atom.element === 'O' ? 0xff0000 
-           : 0xff00ff,
-        shininess: 100
+       atom.element === 'C' ? 0x808080 :
+       atom.element === 'N' ? 0x0000ff :
+       atom.element === 'O' ? 0xff0000 :
+       atom.element === 'F' ? 0x32CD32 :  // Fluorine - Neon Green
+       atom.element === 'Cl' ? 0x008000 : // Chlorine - Deep Green
+       0xff00ff,
+shininess: 100
+
       });
       const sphere = new THREE.Mesh(geometry, material);
       sphere.position.copy(atom.position);

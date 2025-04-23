@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const MoleculeProperties = ({ smiles }) => {  // Receiving smiles as a prop
+const MoleculeProperties = ({ smiles }) => {  
     const [properties, setProperties] = useState(null);
     const [moleculeName, setMoleculeName] = useState("");
     const [error, setError] = useState("");
@@ -9,7 +9,7 @@ const MoleculeProperties = ({ smiles }) => {  // Receiving smiles as a prop
         if (!smiles) {
             setError("");
             setProperties(null);
-            return; // Don't fetch if input is empty
+            return;
         }
 
         const fetchProperties = async () => {
@@ -20,17 +20,15 @@ const MoleculeProperties = ({ smiles }) => {  // Receiving smiles as a prop
             try {
                 const response = await fetch("http://localhost:8000/analyze", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ smiles }),  // Use the prop
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ smiles }),
                 });
 
                 const result = await response.json();
 
                 if (response.ok && result.properties) {
                     setProperties(result.properties);
-                    setMoleculeName(result.properties["Molecule Name"] || "Unknown Molecule"); 
+                    setMoleculeName(result.properties["Molecule Name"] || "Unknown Molecule");
                 } else {
                     setError(result.error || "Invalid SMILES string or error fetching properties.");
                 }
@@ -39,25 +37,29 @@ const MoleculeProperties = ({ smiles }) => {  // Receiving smiles as a prop
             }
         };
 
-        fetchProperties();  // Auto-fetch when smiles changes
-    }, [smiles]);  // Runs every time smiles updates
+        fetchProperties();
+    }, [smiles]);
 
     return (
         <div className="molecule">
-            <h2 className="space">Molecule Properties</h2>
-            {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
-            {properties && (
-                <div className="res" style={{  padding: "10px" }}>
-                    <h3>Properties of {moleculeName}</h3> 
-                    <ul>
-                        {Object.entries(properties).map(([key, value]) => (
-                            <li key={key}><strong>{key}:</strong> {value}</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+          <h2 className="space app-title2">Molecule Properties</h2>
+          {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      
+          {properties && (
+            <div className="glass-box"> {/* Changed from properties-box */}
+              <h3>Properties of {moleculeName}</h3> 
+              <div className="glass-table"> {/* Changed from properties-table */}
+                {Object.entries(properties).map(([key, value]) => (
+                  <div className="glass-row" key={key}> {/* Changed from property-row */}
+                    <span className="glass-property-name">{key}</span>
+                    <span className="glass-property-value">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-    );
+      );
 };
 
 export default MoleculeProperties;

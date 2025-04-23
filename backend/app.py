@@ -153,6 +153,46 @@ Please consider all the above information when answering the following question.
     except Exception as e:
         return f"Error: {str(e)}"
 
+def generate_2d_structure(smiles):
+    """Generate 2D molecular structure visualization with RDKit."""
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+            
+        # Generate 2D coordinates
+        AllChem.Compute2DCoords(mol)
+        
+        # Customize visualization
+        drawer = Draw.rdMolDraw2D.MolDraw2DSVG(400, 400)
+        drawer.DrawMolecule(mol)
+        drawer.FinishDrawing()
+        
+        # Get SVG content and convert to base64
+        svg = drawer.GetDrawingText()
+        return f"data:image/svg+xml;base64,{base64.b64encode(svg.encode()).decode()}"
+    except Exception as e:
+        print(f"Error generating 2D structure: {str(e)}")
+        return None
+
+@app.route("/chart", methods=["POST"])
+def chart():
+    data = request.get_json()
+    smiles = data.get("smiles")
+    try:
+        # Get toxicity predictions as before
+        toxicity, _ = predict_toxicity(smiles)
+        # Convert toxicity dict to an array of objects for charting
+        predictions = []
+        for endpoint, details in toxicity.items():
+            predictions.append({
+                "endpoint": endpoint,
+                "value": details["confidence"]
+            })
+        return jsonify({"predictions": predictions})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/convert", methods=["POST"])
 def convert():
@@ -179,6 +219,7 @@ def analyze():
     properties, prop_explanation = get_molecule_properties(smiles)
     toxicity, tox_explanation = predict_toxicity(smiles)
     image_base64 = generate_molecule_image(smiles)
+    molecule_image_2d = generate_2d_structure(smiles)
     gemini_response = ""
     if prompt:
         gemini_response = query_gemini(prompt, smiles, prop_explanation, tox_explanation)
@@ -187,6 +228,7 @@ def analyze():
         "properties": properties,
         "toxicity": toxicity,
         "molecule_image": image_base64,
+        "molecule_image_2d": molecule_image_2d,
         "gemini_response": gemini_response,
     })
 
